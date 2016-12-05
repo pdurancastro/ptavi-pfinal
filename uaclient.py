@@ -44,8 +44,50 @@ if __name__ == "__main__":
     Proxy_IP = diccionario['regproxy_ip']
     Proxy_Puerto = int(diccionario['regproxy_puerto'])
 
-    print(Proxy_IP)
-    print(Proxy_Puerto)
+    #print(Proxy_IP)
+    #print(Proxy_Puerto)
 
     my_socket.connect((Proxy_IP, Proxy_Puerto))   
     ##################################################################################
+    
+    #########MANDAR_PETICION####################################################
+    username = diccionario['username']
+    if Metodo == 'REGISTER':        
+        puerto_server = diccionario['uaserver_puerto']            
+        Peticion = Metodo + " " + 'sip:' + username + ":" + puerto_server +' SIP/2.0\r\n'
+        Cabecera = "Expires: " + str(Opcion) + '\r\n\r\n'
+        MENSAJE = Peticion + Cabecera
+        print("Enviando----->")
+        print(MENSAJE)
+        
+    
+    elif Metodo == 'INVITE':
+        ip_servidor = diccionario['uaserver_ip']
+        puerto_rtp=diccionario['rtp_puerto']
+        Peticion = Metodo + " " + 'sip:' + Opcion + ' SIP/2.0\r\n'
+        Cabecera = 'Content-Type: application/sdp\r\n\r\n'
+        Paq_sdp = 'v=0 ' + 'o=' + username + ' ' + ip_servidor + '\r\n' + 's=misesion\r\n' + 't=0' + '\r\n' + 'm = audio ' + str(puerto_rtp) + ' RTP'
+        MENSAJE = Peticion + Cabecera + Paq_sdp
+        print("Enviando----->")
+        print(MENSAJE)
+         
+    
+    #elif Metodo == 'BYE':
+    
+    #else:
+    
+    
+    
+        
+    my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
+    data = my_socket.recv(1024)
+    print(data.decode('utf-8'))
+
+    
+    
+    
+    
+    
+    
+    
+    
