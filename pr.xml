@@ -1,0 +1,5 @@
+<config>
+    <server name="Mi_Servidor_Proxy" ip="127.0.0.01" puerto="7002"/>
+    <database passwdpath="passwords"/>
+    <log path="Log_Proxy.txt"/>
+</config>
