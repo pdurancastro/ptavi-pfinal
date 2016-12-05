@@ -49,7 +49,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 2:
         print("Usage: python uaserver.py config") 
         sys.exit()
-        
+    
+    #######XML#######
+    ###################################################################################    
     parser.setContentHandler(cHandler)   
     try:
         #Me abrira cualquier xml en funcion del argumento que le pase
@@ -61,5 +63,8 @@ if __name__ == "__main__":
         sys.exit('Usage: python uaserver.py config')
 
     print(mytags)
+    ###################################################################################
+    
+    
     print("Listening...")
          
