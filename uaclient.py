@@ -8,6 +8,7 @@ from uaserver import XMLhandler
 
 import sys
 import uaserver
+import socket
 
 if __name__ == "__main__":
 
@@ -34,3 +35,17 @@ if __name__ == "__main__":
        sys.exit()
     print(mytags)
     ###################################################################################
+    
+    
+    #########SERVIDOR_PROXY############################################################
+    my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    diccionario = mytags
+    Proxy_IP = diccionario['regproxy_ip']
+    Proxy_Puerto = int(diccionario['regproxy_puerto'])
+
+    print(Proxy_IP)
+    print(Proxy_Puerto)
+
+    my_socket.connect((Proxy_IP, Proxy_Puerto))   
+    ##################################################################################
