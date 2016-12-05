@@ -61,4 +61,5 @@ if __name__ == "__main__":
         sys.exit('Usage: python uaserver.py config')
 
     print(mytags)
+    print("Listening...")
          
