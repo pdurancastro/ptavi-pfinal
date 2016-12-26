@@ -46,7 +46,7 @@ if __name__ == "__main__":
     xml = sys.argv[1] 
     
     
-    if len(sys.argv) > 2:
+    if len(sys.argv) != 2:
         print("Usage: python uaserver.py config") 
         sys.exit()
     
