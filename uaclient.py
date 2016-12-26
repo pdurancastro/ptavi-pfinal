@@ -9,17 +9,19 @@ from uaserver import XMLhandler
 import sys
 import uaserver
 import socket
+import time
 
 if __name__ == "__main__":
 
-    xml = sys.argv[1]
-    Metodo = sys.argv[2]
-    Opcion = sys.argv[3]
-    
-    
-    if len(sys.argv) > 4:
+            
+    if len(sys.argv) != 4:
         print("Usage: python uaclient.py config method option") 
         sys.exit()
+        
+        
+    xml = sys.argv[1]
+    Metodo = sys.argv[2]
+    Opcion = sys.argv[3]    
     
     #######XML#######
     ###################################################################################            
@@ -43,6 +45,8 @@ if __name__ == "__main__":
     diccionario = mytags
     Proxy_IP = diccionario['regproxy_ip']
     Proxy_Puerto = int(diccionario['regproxy_puerto'])
+    Log = diccionario['log_path']
+
 
     #print(Proxy_IP)
     #print(Proxy_Puerto)
@@ -59,6 +63,9 @@ if __name__ == "__main__":
         MENSAJE = Peticion + Cabecera
         print("Enviando----->")
         print(MENSAJE)
+        my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
+        data = my_socket.recv(1024)
+        print(data.decode('utf-8'))
         
     
     elif Metodo == 'INVITE':
@@ -70,18 +77,22 @@ if __name__ == "__main__":
         MENSAJE = Peticion + Cabecera + Paq_sdp
         print("Enviando----->")
         print(MENSAJE)
+        my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
+        data = my_socket.recv(1024)
+        print(data.decode('utf-8'))
          
     
-    #elif Metodo == 'BYE':
+    elif Metodo == 'BYE':
+        Peticion = Metodo + " " + 'sip:' + Opcion + ' SIP/2.0\r\n'
+        MENSAJE = Peticion
+        print("Enviando----->")
+        print(MENSAJE)
+        my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
+        data = my_socket.recv(1024)
+        print(data.decode('utf-8'))
     
     #else:
     
-    
-    
-        
-    my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
-    data = my_socket.recv(1024)
-    print(data.decode('utf-8'))
 
     
     
