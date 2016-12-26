@@ -7,6 +7,8 @@ from xml.sax.handler import ContentHandler
 import sys
 import socket
 import socketserver
+import time
+import random
 
 class XML_Prox_Handler(ContentHandler):
     def __init__(self):
@@ -34,16 +36,45 @@ class XML_Prox_Handler(ContentHandler):
 class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     dict = {}    
     list_client = []
+    NoAuthDicc = {}
     
     def handle(self):
         client = self.rfile.read().decode('utf-8').split()
         print("CLIENTE ----->")
         print(client)                       
         if client[0] == "REGISTER":
-            print(client[0])
+            print("Compruebo que mi procedimiento es " + client[0])
+            #Con esto chopeo mediante los : y me quedo con el elemento que quiero de ello
+            User_Name = client[1].split(':')[1]
+            User_Port = client[1].split(':')[2]
+            User_IP = self.client_address[0]
+            Expires = time.time() + int(client[4])
+            #Con esto tengo todos los datos de mi cliente nuevo       
+            #print(User_Name)
+            #print(User_Port)
+            #print(User_IP)
+            #print(client[4])
+            #print(Expires)
+
+            #Respuesta de cliente no Autorizado
+            if len(client) == 5:
+                print("Usuario no Autorizado")
+                self.NoAuthDicc[User_Name] = random.getrandbits(100)
+                Converbyts = bytes(str(self.NoAuthDicc[User_Name]), 'utf-8')
+                self.wfile.write(b"SIP/2.0 401 Unauthorized\r\n" + b"WWW Authenticate: Digest nonce=" + Converbyts + \
+                                 b"\r\n\r\n")
+                
+                
+
             
         if client[0] == "INVITE":
-            print(client[1])    
+            print(client[0])
+        
+        if client[0] == "BYE":
+            print(client[0])
+            
+                
+            
             
             
             
@@ -76,6 +107,10 @@ if __name__ == "__main__":
     diccionario_proxy_xml = mytags
     puerto_proxy = int(diccionario_proxy_xml['Puerto_Proxy'])    
     proxy_serv = socketserver.UDPServer(('', puerto_proxy), SIPRegisterHandler)
+    
+    MyServer = "Server MiServidorProxy listening at port"
+    print(MyServer + " " + str(puerto_proxy) + "...")
+    
     proxy_serv.serve_forever()
 
     
