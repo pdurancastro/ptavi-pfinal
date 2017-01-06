@@ -10,6 +10,7 @@ import sys
 import uaserver
 import socket
 import time
+import hashlib
 
 if __name__ == "__main__":
 
@@ -65,7 +66,29 @@ if __name__ == "__main__":
         print(MENSAJE)
         my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
         data = my_socket.recv(1024)
-        print(data.decode('utf-8'))
+        data_1 = data.decode('utf-8')
+        print(data_1)
+        data_1 = data_1.split(' ')
+        
+        if data_1[1] == "401":
+            print("Entra en el reenvio del register")
+            #Cojo el codigo que me entrego el proxy
+            nonce = data_1[5].split("nonce=")
+            nonce = nonce[1]
+            #print(nonce)
+            passwd = diccionario['passwd']
+            #print(passwd)
+            passwdbt = (bytes(passwd, 'utf-8'))
+            noncebt = (bytes(nonce, 'utf-8'))
+            #Cifrado de la contraseña y codigo
+            m = hashlib.md5()
+            m.update(passwdbt + noncebt)
+            response = m.hexdigest()
+            print("Mandando el REGISTER con clave " + response + " ------>" + "\r\n" )
+            Cabecera_noesp = "Expires: " + str(Opcion) + "\r\n"
+            MENSAJE = Peticion + Cabecera_noesp            
+            MENSAJE = MENSAJE + "Authorization: Digest response=" + response + "\r\n"
+            print(MENSAJE)
         
     
     elif Metodo == 'INVITE':
