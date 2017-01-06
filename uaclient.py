@@ -89,6 +89,7 @@ if __name__ == "__main__":
             MENSAJE = Peticion + Cabecera_noesp            
             MENSAJE = MENSAJE + "Authorization: Digest response=" + response + "\r\n"
             print(MENSAJE)
+            my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
         
     
     elif Metodo == 'INVITE':
