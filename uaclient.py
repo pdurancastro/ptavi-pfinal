@@ -75,14 +75,15 @@ if __name__ == "__main__":
             #Cojo el codigo que me entrego el proxy
             nonce = data_1[5].split("nonce=")
             nonce = nonce[1]
-            #print(nonce)
+            print(nonce)
             passwd = diccionario['passwd']
-            #print(passwd)
+            print(passwd)
             passwdbt = (bytes(passwd, 'utf-8'))
             noncebt = (bytes(nonce, 'utf-8'))
             #Cifrado de la contraseña y codigo
-            m = hashlib.md5()
-            m.update(passwdbt + noncebt)
+            m = hashlib.sha1()
+            m.update(passwdbt)
+            m.update(noncebt)
             response = m.hexdigest()
             print("Mandando el REGISTER con clave " + response + " ------>" + "\r\n" )
             Cabecera_noesp = "Expires: " + str(Opcion) + "\r\n"
@@ -90,6 +91,7 @@ if __name__ == "__main__":
             MENSAJE = MENSAJE + "Authorization: Digest response=" + response + "\r\n"
             print(MENSAJE)
             my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
+
         
     
     elif Metodo == 'INVITE':
