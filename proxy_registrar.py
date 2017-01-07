@@ -10,6 +10,8 @@ import socketserver
 import time
 import random
 import json
+import hashlib
+import os
 
 class XML_Prox_Handler(ContentHandler):
     def __init__(self):
@@ -37,19 +39,65 @@ class XML_Prox_Handler(ContentHandler):
 class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     dict = {}    
     list_client = []
-    NoAuthDicc = {}
+    Dicc_Pass = {}
+    
+    #def register2json(self):
+     #   fich = json.dumps(self.dict)
+      #  with open('registered.json', 'w') as fich:
+       #     json.dump(self.dicc, fich ,sort_keys=True, indent=4)
+            
+
+        
+    def json2register(self):
+        try:
+            with open('registered.json') as client_file:
+                self.client_list = json.load(client_file)
+        except:
+            self.register2json()
     
     def register2json(self):
-        fich = json.dumps(self.dict)
-        with open('registered.json', 'w') as fich:
-            json.dump(self.dicc, fich ,sort_keys=True, indent=4)
-
+        fichero_json = open('registered.json', "w")
+        json.dump(self.client_list, fichero_json, indent='\t')
+    
+ 
     
     def handle(self):
         
         client = self.rfile.read().decode('utf-8').split()
         print("CLIENTE ----->")
-        print(client)                       
+        print(client)    
+               
+        #self.json2register(fich_json)
+        #self.json2passwd(fich_pass)
+        #self.register2json(fich_json)
+        
+        
+        #Con esto extraigo los datos de mi fichero passwords.txt
+        print(diccionario_proxy_xml)
+        fich_pass = diccionario_proxy_xml['Contraseñas']
+        print(fich_pass)
+        passwords = open(fich_pass, 'r')
+        passwords_datos = passwords.read()
+        print(passwords_datos)
+        
+        separo = passwords_datos.split(",")
+        print(separo)
+        
+        User1_passwd1 = separo[0].split(":")
+        User1 = User1_passwd1[0]
+        passwd1 = User1_passwd1[1]
+        print("Mi usuario es " + User1)
+        print("Mi contraseña es " + passwd1)
+        
+        User2_passwd2 = separo[1].split(":")
+        User2 = User2_passwd2[0]
+        passwd2 = User2_passwd2[1]
+        
+        print("Mi usuario es " + User2)
+        print("Mi contraseña es " + passwd2)       
+               
+        
+                           
         if client[0] == "REGISTER":
             print("Compruebo que mi procedimiento es " + client[0])
             #Con esto chopeo mediante los : y me quedo con el elemento que quiero de ello
@@ -67,25 +115,18 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             
             ########################################################################################################
             #Genero numero random
-            self.NoAuthDicc[User_Name] = random.getrandbits(100)
-            Converbyts = bytes(str(self.NoAuthDicc[User_Name]), 'utf-8')
             
             
+            #self.Dicc_Pass[User_Name] = random.getrandbits(100)
+            self.Dicc_Pass[User_Name] = "98765432"
+            print("Genero mi numero random 1 vez")
+            Converbyts = bytes(str(self.Dicc_Pass[User_Name]), 'utf-8')
+            noncebt = Converbyts            
+            passwd1 = (bytes(passwd1, 'utf-8'))
+
             
-            #fich_passwd = diccionario_proxy_xml['passwdpath']
+              
             
-            
-            
-            
-            #noncebt = Converbyts
-            passwdbt = diccionario_proxy_xml['Contraseñas']
-            print(passwdbt)
-            
-            print(diccionario_proxy_xml)
-            #print("Esta es la contraseña" + passwdbt)
-            #m = hashlib.md5()
-            #m.update(passwdbt + noncebt)
-            #response = m.hexdigest()
             #########################################################################################################
             
             
@@ -94,6 +135,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 print("Usuario no Autorizado")               
                 self.wfile.write(b"SIP/2.0 401 Unauthorized\r\n" + b"WWW Authenticate: Digest nonce=" + Converbyts + \
                                  b"\r\n\r\n")
+                
+                
 
             if len(client) == 8:
                 print("Usuario Autorizado")
@@ -103,9 +146,18 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     print("Tiempo expiracion valido")
                     if client[7] != " ":
                         print(client[7])
-                        response = client[7].split("response=")
-                        response = response[1]
-                        print(response)
+                        m = hashlib.sha1()
+                        m.update(passwd1)
+                        m.update(noncebt)
+                        new_response = m.hexdigest()
+                        print("NEW RESPONSE " + new_response)
+                        
+                        response_1 = client[7].split("response=")
+                        response_1 = response_1[1]
+                        print(response_1)
+                        if response_1 == new_response:
+                            print("Hola")
+                        
                         #print(response_1)
                         
                         #if response == response_1:
