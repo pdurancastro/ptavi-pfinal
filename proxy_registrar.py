@@ -9,6 +9,7 @@ import socket
 import socketserver
 import time
 import random
+import json
 
 class XML_Prox_Handler(ContentHandler):
     def __init__(self):
@@ -38,7 +39,14 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     list_client = []
     NoAuthDicc = {}
     
+    def register2json(self):
+        fich = json.dumps(self.dict)
+        with open('registered.json', 'w') as fich:
+            json.dump(self.dicc, fich ,sort_keys=True, indent=4)
+
+    
     def handle(self):
+        
         client = self.rfile.read().decode('utf-8').split()
         print("CLIENTE ----->")
         print(client)                       
@@ -55,14 +63,61 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             #print(User_IP)
             #print(client[4])
             #print(Expires)
-
+            
+            
+            ########################################################################################################
+            #Genero numero random
+            self.NoAuthDicc[User_Name] = random.getrandbits(100)
+            Converbyts = bytes(str(self.NoAuthDicc[User_Name]), 'utf-8')
+            
+            
+            
+            #fich_passwd = diccionario_proxy_xml['passwdpath']
+            
+            
+            
+            
+            #noncebt = Converbyts
+            passwdbt = diccionario_proxy_xml['Contraseñas']
+            print(passwdbt)
+            
+            print(diccionario_proxy_xml)
+            #print("Esta es la contraseña" + passwdbt)
+            #m = hashlib.md5()
+            #m.update(passwdbt + noncebt)
+            #response = m.hexdigest()
+            #########################################################################################################
+            
+            
             #Respuesta de cliente no Autorizado
             if len(client) == 5:
-                print("Usuario no Autorizado")
-                self.NoAuthDicc[User_Name] = random.getrandbits(100)
-                Converbyts = bytes(str(self.NoAuthDicc[User_Name]), 'utf-8')
+                print("Usuario no Autorizado")               
                 self.wfile.write(b"SIP/2.0 401 Unauthorized\r\n" + b"WWW Authenticate: Digest nonce=" + Converbyts + \
                                  b"\r\n\r\n")
+
+            if len(client) == 8:
+                print("Usuario Autorizado")
+                print(client[4])
+                
+                if client[4] != "0":
+                    print("Tiempo expiracion valido")
+                    if client[7] != " ":
+                        print(client[7])
+                        response = client[7].split("response=")
+                        response = response[1]
+                        print(response)
+                        #print(response_1)
+                        
+                        #if response == response_1:
+                            #print("Vamos bien")
+                        
+                        
+                        #self.registered2json()
+                        
+                       
+                
+                                 
+           
                 
                 
 
