@@ -40,12 +40,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     dict = {}    
     Dicc_Pass = {}
     
-   # def register2json(self):
-    #    fich = json.dumps(self.dict)
-     #   with open('registered.json', 'w') as fich:
-      #      json.dump(self.dicc, fich ,sort_keys=True, indent=4)
-           
-
         
     def json2register(self):
         try:
@@ -166,6 +160,10 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                                 print("Enviando 200 OK.....")
                                 self.register2json()
+                                self.dict[User_Name] = User_IP
+                                self.dict[User_Name] = User_Port
+                                self.dict[User_Name] = Expires
+                                
                         
                         #Necesito comparar mi 2 cliente con la información que me llega
                         cliente_2 = client[1].split(":")
