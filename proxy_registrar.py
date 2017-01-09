@@ -73,28 +73,32 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         
         
         #Con esto extraigo los datos de mi fichero passwords.txt
-        print(diccionario_proxy_xml)
+        #print(diccionario_proxy_xml)
         fich_pass = diccionario_proxy_xml['Contraseñas']
-        print(fich_pass)
+        #print(fich_pass)
         passwords = open(fich_pass, 'r')
         passwords_datos = passwords.read()
-        print(passwords_datos)
+        #print(passwords_datos)
         
         separo = passwords_datos.split(",")
-        print(separo)
+        #print(separo)
         
         User1_passwd1 = separo[0].split(":")
         User1 = User1_passwd1[0]
         passwd1 = User1_passwd1[1]
-        print("Mi usuario es " + User1)
-        print("Mi contraseña es " + passwd1)
+        #print("Mi usuario es " + User1)
+        #print("Mi contraseña es " + passwd1)
         
         User2_passwd2 = separo[1].split(":")
         User2 = User2_passwd2[0]
         passwd2 = User2_passwd2[1]
         
-        print("Mi usuario es " + User2)
-        print("Mi contraseña es " + passwd2)       
+        #print("Mi usuario es " + User2)
+        #print("Mi contraseña es " + passwd2)
+        #Quito un \r\n que sobra
+        passwd2 = passwd2.split("\n")
+        passwd2 = passwd2[0]
+             
                
         
                            
@@ -117,12 +121,12 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             #Genero numero random
             
             
-            #self.Dicc_Pass[User_Name] = random.getrandbits(100)
-            self.Dicc_Pass[User_Name] = "98765432"
-            print("Genero mi numero random 1 vez")
+
+            self.Dicc_Pass[User_Name] = "98765434546545646542"
             Converbyts = bytes(str(self.Dicc_Pass[User_Name]), 'utf-8')
             noncebt = Converbyts            
             passwd1 = (bytes(passwd1, 'utf-8'))
+            passwd2 = (bytes(passwd2, 'utf-8'))
 
             
               
@@ -131,37 +135,79 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             
             
             #Respuesta de cliente no Autorizado
-            if len(client) == 5:
-                print("Usuario no Autorizado")               
-                self.wfile.write(b"SIP/2.0 401 Unauthorized\r\n" + b"WWW Authenticate: Digest nonce=" + Converbyts + \
-                                 b"\r\n\r\n")
+
+                
                 
                 
 
             if len(client) == 8:
                 print("Usuario Autorizado")
-                print(client[4])
-                
+                #Si el tiempo de expiracion es distinto de 0
                 if client[4] != "0":
                     print("Tiempo expiracion valido")
                     if client[7] != " ":
-                        print(client[7])
-                        m = hashlib.sha1()
-                        m.update(passwd1)
-                        m.update(noncebt)
-                        new_response = m.hexdigest()
-                        print("NEW RESPONSE " + new_response)
+                        #print(client)
+                        #print(client[7])
+                        #print(client[1])
+                        #print(User1)
+                        #Necesito comparar mi 1 cliente con la información que me llega
+                        cliente_1 = client[1].split(":")
+                        cliente_1 = cliente_1[1]                        
                         
-                        response_1 = client[7].split("response=")
-                        response_1 = response_1[1]
-                        print(response_1)
-                        if response_1 == new_response:
-                            print("Hola")
+                        
+                        #USUARIO_1 REGISTER##############################################
+                        if cliente_1 == User1:
+                            print("ESTAMOS CON EL CLIENTE " + cliente_1)
+                            m = hashlib.sha1()
+                            m.update(passwd1)
+                            m.update(noncebt)
+                            new_response = m.hexdigest()
+                            response_1 = client[7].split("response=")
+                            response_1 = response_1[1]
+                            if response_1 == new_response:
+                                self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                                print("Enviando 200 OK.....")
+                        
+                        
+                        #Necesito comparar mi 2 cliente con la información que me llega
+                        cliente_2 = client[1].split(":")
+                        cliente_2 = cliente_2[1]
+                        print(cliente_2)
+                        ###################################################################
+                        
+                        #USUARIO_2 REGISTER################################################
+                        if cliente_2 == User2:
+                            print("ESTAMOS CON EL CLIENTE " + cliente_2)
+                            m = hashlib.sha1()
+                            m.update(passwd2)
+                            m.update(noncebt)
+                            new_response = m.hexdigest()
+                            response_2 = client[7].split("response=")
+                            response_2 = response_2[1]
+                            if response_2 == new_response:
+                                self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                                print("Enviando 200 OK.....")
+                                
+                            
+                         
+                         
+                            
+                            
+                            
+            elif len(client) != 8 and len(client) !=5:
+                print("SIP/2.0 400 Bad Request")                
+                            
+            else:
+                print("Usuario no Autorizado")               
+                self.wfile.write(b"SIP/2.0 401 Unauthorized\r\n" + b"WWW Authenticate: Digest nonce=" + noncebt + \
+                                 b"\r\n\r\n")
+
                         
                         #print(response_1)
                         
                         #if response == response_1:
                             #print("Vamos bien")
+         
                         
                         
                         #self.registered2json()
