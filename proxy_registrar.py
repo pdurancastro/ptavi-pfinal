@@ -43,13 +43,13 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         
     def json2register(self):
         try:
-            with open('registered.json') as client_file:
+            with open('usuarios.json') as client_file:
                 self.dict = json.load(client_file)
         except:
             self.register2json()
     
     def register2json(self):
-        json.dump(self.dict, open('registered.json', 'w'))
+        json.dump(self.dict, open('usuarios.json', 'w'))
     
  
     
