@@ -73,14 +73,18 @@ if __name__ == "__main__":
         if data_1[1] == "401":
             print("Entra en el reenvio del register")
             #Cojo el codigo que me entrego el proxy
-            nonce = data_1[5].split("nonce=")
-            nonce = nonce[1]
-            print(nonce)
+            nonce = data_1[5].split("\r\n")
+            nonce = nonce[0]
             passwd = diccionario['passwd']
-            print(passwd)
+            nonce = nonce.split("nonce=")
+            nonce = nonce[1]
+          
+            passwd = diccionario['passwd']
             passwdbt = (bytes(passwd, 'utf-8'))
             noncebt = (bytes(nonce, 'utf-8'))
             #Cifrado de la contraseña y codigo
+            print(passwdbt)
+            print(noncebt)
             m = hashlib.sha1()
             m.update(passwdbt)
             m.update(noncebt)
