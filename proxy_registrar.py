@@ -151,10 +151,14 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                         response_1 = response_1[1]
                         if response_1 == new_response:
                         #Si el tiempo de expiracion es distinto de 0
+                            Time = time.time()
+                            Exp_Time = Time + int(client[4])
+                            Tiempo_usuario = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(Exp_Time))
+                            
                             if client[4] != "0":
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                                 print("Enviando 200 OK.....")                                
-                                self.dict[User_Name] = User_IP, User_Port, Expires                                                               
+                                self.dict[User_Name] = User_IP,User_Port,Expires,Tiempo_usuario                                                          
                                 self.register2json()
                             else:
                                 del self.dict[User_Name]            
@@ -178,11 +182,14 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                         response_2 = client[7].split("response=")
                         response_2 = response_2[1]
                         if response_2 == new_response:
-                        #Si el tiempo de expiracion es distinto de 0
+                        #Si el tiempo de expiracion es distinto de 0                       
+                            Time = time.time()
+                            Exp_Time = Time + int(client[4])
+                            Tiempo_usuario = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(Exp_Time))
                             if client[4] != "0":
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                                 print("Enviando 200 OK.....")
-                                self.dict[User_Name] = User_IP, User_Port, Expires                              
+                                self.dict[User_Name] = User_IP, User_Port, Expires, Tiempo_usuario                           
                                 self.register2json()
                             else:
                                 del self.dict[User_Name]            
