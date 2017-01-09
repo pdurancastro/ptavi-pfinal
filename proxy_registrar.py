@@ -38,26 +38,24 @@ class XML_Prox_Handler(ContentHandler):
 ###TRATO_LAS_PETICIONES_CLIENTE#############################################################        
 class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     dict = {}    
-    list_client = []
     Dicc_Pass = {}
     
-    #def register2json(self):
-     #   fich = json.dumps(self.dict)
-      #  with open('registered.json', 'w') as fich:
-       #     json.dump(self.dicc, fich ,sort_keys=True, indent=4)
-            
+   # def register2json(self):
+    #    fich = json.dumps(self.dict)
+     #   with open('registered.json', 'w') as fich:
+      #      json.dump(self.dicc, fich ,sort_keys=True, indent=4)
+           
 
         
     def json2register(self):
         try:
             with open('registered.json') as client_file:
-                self.client_list = json.load(client_file)
+                self.Dicc_Pass = json.load(client_file)
         except:
             self.register2json()
     
     def register2json(self):
-        fichero_json = open('registered.json', "w")
-        json.dump(self.client_list, fichero_json, indent='\t')
+        json.dump(self.Dicc_Pass, open('registered.json', 'w'))
     
  
     
@@ -167,7 +165,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                             if response_1 == new_response:
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                                 print("Enviando 200 OK.....")
-                        
+                                self.register2json()
                         
                         #Necesito comparar mi 2 cliente con la información que me llega
                         cliente_2 = client[1].split(":")
@@ -187,10 +185,10 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                             if response_2 == new_response:
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                                 print("Enviando 200 OK.....")
-                                
+                                self.register2json()
+                        self.json2register()
                             
-                         
-                         
+                        
                             
                             
                             
