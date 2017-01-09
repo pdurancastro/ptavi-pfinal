@@ -11,7 +11,7 @@ import time
 import random
 import json
 import hashlib
-import os
+import time
 
 class XML_Prox_Handler(ContentHandler):
     def __init__(self):
@@ -44,12 +44,12 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     def json2register(self):
         try:
             with open('registered.json') as client_file:
-                self.Dicc_Pass = json.load(client_file)
+                self.dict = json.load(client_file)
         except:
             self.register2json()
     
     def register2json(self):
-        json.dump(self.Dicc_Pass, open('registered.json', 'w'))
+        json.dump(self.dict, open('registered.json', 'w'))
     
  
     
@@ -127,66 +127,68 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             
             
             #Respuesta de cliente no Autorizado
-
-                
-                
-                
-
             if len(client) == 8:
                 print("Usuario Autorizado")
-                #Si el tiempo de expiracion es distinto de 0
-                if client[4] != "0":
-                    print("Tiempo expiracion valido")
-                    if client[7] != " ":
+                print("Tiempo expiracion valido")
+                if client[7] != " ":
                         #print(client)
                         #print(client[7])
                         #print(client[1])
                         #print(User1)
                         #Necesito comparar mi 1 cliente con la información que me llega
-                        cliente_1 = client[1].split(":")
-                        cliente_1 = cliente_1[1]                        
+                    cliente_1 = client[1].split(":")
+                    cliente_1 = cliente_1[1]                        
                         
                         
                         #USUARIO_1 REGISTER##############################################
-                        if cliente_1 == User1:
-                            print("ESTAMOS CON EL CLIENTE " + cliente_1)
-                            m = hashlib.sha1()
-                            m.update(passwd1)
-                            m.update(noncebt)
-                            new_response = m.hexdigest()
-                            response_1 = client[7].split("response=")
-                            response_1 = response_1[1]
-                            if response_1 == new_response:
+                    if cliente_1 == User1:
+                        print("ESTAMOS CON EL CLIENTE " + cliente_1)
+                        m = hashlib.sha1()
+                        m.update(passwd1)
+                        m.update(noncebt)
+                        new_response = m.hexdigest()
+                        response_1 = client[7].split("response=")
+                        response_1 = response_1[1]
+                        if response_1 == new_response:
+                        #Si el tiempo de expiracion es distinto de 0
+                            if client[4] != "0":
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
-                                print("Enviando 200 OK.....")
+                                print("Enviando 200 OK.....")                                
+                                self.dict[User_Name] = User_IP, User_Port, Expires                                                               
                                 self.register2json()
-                                self.dict[User_Name] = User_IP
-                                self.dict[User_Name] = User_Port
-                                self.dict[User_Name] = Expires
+                            else:
+                                del self.dict[User_Name]            
+                                self.register2json() 
                                 
                         
                         #Necesito comparar mi 2 cliente con la información que me llega
-                        cliente_2 = client[1].split(":")
-                        cliente_2 = cliente_2[1]
-                        print(cliente_2)
+                        
+                    cliente_2 = client[1].split(":")
+                    cliente_2 = cliente_2[1]
+                    print(cliente_2)
                         ###################################################################
                         
                         #USUARIO_2 REGISTER################################################
-                        if cliente_2 == User2:
-                            print("ESTAMOS CON EL CLIENTE " + cliente_2)
-                            m = hashlib.sha1()
-                            m.update(passwd2)
-                            m.update(noncebt)
-                            new_response = m.hexdigest()
-                            response_2 = client[7].split("response=")
-                            response_2 = response_2[1]
-                            if response_2 == new_response:
+                    if cliente_2 == User2:
+                        print("ESTAMOS CON EL CLIENTE " + cliente_2)
+                        m = hashlib.sha1()
+                        m.update(passwd2)
+                        m.update(noncebt)
+                        new_response = m.hexdigest()
+                        response_2 = client[7].split("response=")
+                        response_2 = response_2[1]
+                        if response_2 == new_response:
+                        #Si el tiempo de expiracion es distinto de 0
+                            if client[4] != "0":
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                                 print("Enviando 200 OK.....")
+                                self.dict[User_Name] = User_IP, User_Port, Expires                              
                                 self.register2json()
-                        self.json2register()
-                            
-                        
+                            else:
+                                del self.dict[User_Name]            
+                                self.register2json()
+                                
+                    self.json2register()                 
                             
                             
                             
