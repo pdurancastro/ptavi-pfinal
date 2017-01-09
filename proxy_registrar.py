@@ -55,7 +55,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     
     def handle(self):
         
-        client = self.rfile.read().decode('utf-8').split()
+        cliente = self.rfile.read().decode('utf-8')
+        client = cliente.split()
         print("CLIENTE ----->")
         print(client)    
                
@@ -205,28 +206,58 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             else:
                 print("Usuario no Autorizado")               
                 self.wfile.write(b"SIP/2.0 401 Unauthorized\r\n" + b"WWW Authenticate: Digest nonce=" + noncebt + \
-                                 b"\r\n\r\n")
-
-                        
-                        #print(response_1)
-                        
-                        #if response == response_1:
-                            #print("Vamos bien")
-         
-                        
-                        
-                        #self.registered2json()
-                        
-                       
-                
-                                 
-           
-                
-                
+                                 b"\r\n\r\n")              
 
             
         if client[0] == "INVITE":
-            print(client[0])
+            
+            #Obtencion de direcciones SIP origen y destino
+            User_Orign = client[6]
+            User_Orign = User_Orign.split("=")
+            User_Orign = User_Orign[1]
+            User_Invit = client[1]
+            User_Invit = User_Invit.split(":")
+            User_Invit = User_Invit[1]
+                        
+            print("Usuario al que quiero hacer INVITE " + User_Invit)
+            with open('usuarios.json') as file:
+                data = json.load(file)
+                Informacion = data
+                print(Informacion)
+                Esta = False
+                for Usuario in data:
+                    if Usuario == User_Invit:
+                        Esta = True
+                if Esta == True:
+                    print("El Usuario al que quiero invitar Esta")
+                    
+                    #Creo un socket para mandar la información al usuario del invite
+                    my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    
+                    Info_User_Invit = Informacion[User_Invit]
+                    ip_user_inv = Info_User_Invit[0]
+                    port_user_inv = Info_User_Invit[1]
+                    print("Establezco conexion mediante los siguientes datos:")
+                    print("IP " + ip_user_inv + " " + "Puerto " + port_user_inv) 
+                    my_socket.connect((ip_user_inv, int(port_user_inv)))
+                    
+                    print("Este es mi envio al servidor "+ "\r\n" + cliente)
+                    my_socket.send(bytes(cliente, 'utf-8'))
+                    
+
+                    
+                    
+                
+                else:
+                    print("El Usuario al que quiero invitar no Esta")
+                    request = b'SIP/2.0 404 User Not Found\r\n'
+                    self.wfile.write(request)
+
+                    #request = request.decode('utf-8')
+                
+                        
+            
         
         if client[0] == "BYE":
             print(client[0])
