@@ -117,7 +117,7 @@ if __name__ == "__main__":
             my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
 
             #LOG
-            informacion = hora + " Received from " + str(Proxy_IP) + ":" + str(Proxy_Puerto)
+            informacion = hora + " Received from " + str(Proxy_IP) + ":" + str(Proxy_Puerto) +"\r\n"
             fichero.write(informacion)
             
         if data_1[1] == "404":
@@ -168,7 +168,7 @@ if __name__ == "__main__":
             
             
             #LOG
-            informacion = hora + " " + "Sent to" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + respuesta.replace("\r\n", " ") + "\r\n"
+            informacion = hora + " " + "Sent to" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + respuesta.replace("\r\n", " ") + "RTP" "\r\n"
             fichero.write(informacion)
          
     
@@ -192,7 +192,7 @@ if __name__ == "__main__":
             print("Recibo el SIP/2.0 200 OK ")
             
             #LOG
-            informacion = hora + "Received from" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + "Recibo el SIP/2.0 200 OK \r\n"
+            informacion = hora + " Received from" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + "Recibo el SIP/2.0 200 OK \r\n"
 
     
 
