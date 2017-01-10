@@ -70,6 +70,12 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             aEjecutar+= ' < ' + audio_path
             print ("Vamos a ejecutar", aEjecutar)
             os.system(aEjecutar)
+            print("Ejecutado")
+            
+        if client[0] == "BYE":
+            print("BYE RECIBIDO")
+            respuesta = "SIP/2.0 200 OK\r\n\r\n"
+            self.wfile.write(bytes(respuesta, 'utf-8'))            
         
 
 
