@@ -7,6 +7,7 @@ from xml.sax.handler import ContentHandler
 import sys
 import socket
 import socketserver
+import os
 
 
 #Defino la clase que tratara mi xml
@@ -50,7 +51,25 @@ class EchoHandler(socketserver.DatagramRequestHandler):
         print("CLIENTE ----->")
         print(client)
         
-
+        if client[0] == "INVITE":
+            print("INVITE RECIBIDO")
+            respuesta = "SIP/2.0 100 TRYING\r\n\r\n"
+            respuesta += "SIP/2.0 180 RINGING\r\n\r\n"
+            respuesta += "SIP/2.0 200 OK\r\n\r\n"
+            cabecera_sdp = "Content-Type: application/sdp\r\n\r\n"
+            sdp = 'v=0\r\n' + 'o=' + Nombre_usuario + " " + IP_Server + "\r\n"
+            sdp += 's=misesion\r\n' + 't=0\r\n' + "m=audio " + Puerto_RTP + " RTP\r\n\r\n"
+            print(respuesta + sdp)
+            paquete = respuesta + cabecera_sdp + sdp
+            
+            self.wfile.write(bytes(paquete, 'utf-8'))
+        
+        if client[0] == "ACK":
+            print("ACK RECIBIDO")
+            aEjecutar= './mp32rtp -i ' + IP_Client + ' -p ' + str(Puerto_RTP) 
+            aEjecutar+= ' < ' + audio_path
+            print ("Vamos a ejecutar", aEjecutar)
+            os.system(aEjecutar)
         
 
 
@@ -89,6 +108,10 @@ if __name__ == "__main__":
     my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     diccionario = mytags
     
+    audio_path = diccionario['audio_path']
+    Nombre_usuario = diccionario['username']
+    Puerto_RTP = diccionario['rtp_puerto']
+    
     Proxy_IP = diccionario['regproxy_ip']
     Proxy_Puerto = int(diccionario['regproxy_puerto'])
     Log = diccionario['log_path']
@@ -96,9 +119,8 @@ if __name__ == "__main__":
     my_socket.connect((Proxy_IP, Proxy_Puerto))
     
     IP_Server = diccionario['uaserver_ip']
-    print(IP_Server)
+    IP_Client = IP_Server
     Port_server = int(diccionario['uaserver_puerto'])
-    print(Port_server)
     
     
     
