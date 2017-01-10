@@ -383,6 +383,10 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.connect((User_IP_Serv, int(User_Pto_Serv)))
                         my_socket.send(bytes(cliente, 'utf-8') + b'\r\n')
                         print("Enviado BYE" + "\r\n")
+                        
+                        #LOG
+                        informacion = hora + " Sent to" + " " + str(User_IP_Serv) + ":" + str(User_Pto_Serv) + " " + cliente + "\r\n"
+                        fichero.write(informacion)
                 
                         data = my_socket.recv(1024)
                         reception = data.decode('utf-8')
@@ -391,6 +395,9 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                         if my_reception[0] == "SIP/2.0 200 OK":
                             print("Bien Recibido")
                             self.wfile.write(bytes(reception, 'utf-8'))
+                            #LOG
+                            informacion = hora + "Received SIP/2.0 200 OK"
+                            fichero.write(informacion)
             
             
             
