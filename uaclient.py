@@ -127,7 +127,12 @@ if __name__ == "__main__":
         print(MENSAJE)
         my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
         data = my_socket.recv(1024)
-        print(data.decode('utf-8'))
+        recepcion = data.decode('utf-8')
+        print(recepcion)
+        my_reception = recepcion.split("\r\n")
+        print(my_reception)
+        if my_reception[0] == "SIP/2.0 200 OK":
+            print("Recibo el SIP/2.0 200 OK ")
     
     #else:
     
