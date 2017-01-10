@@ -288,16 +288,46 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.send(bytes(cliente, 'utf-8') + b'\r\n')
                     
                     
-                        #data = my_socket.recv(1024)
-                        #print(data.decode('utf-8'))
+                        data = my_socket.recv(1024)
+                        print(data.decode('utf-8'))
             
             
             
         if client[0] == "BYE":
             print(client[0])
+            peticion = client[1]
+            usr_cliente = peticion.split(":")
+            usr_cliente = usr_cliente[1]
+            print(usr_cliente)
             
+            with open('usuarios.json') as file:
+                data = json.load(file)
+                for Usuario in data:
+                    #Al contrario que en ACK estoy mandando en otra direccion para darme de baja
+                    #Busco la ip y direccion de uaserver
+                    if Usuario != usr_cliente:
+                        print("Coincide el BYE")
+                        User_IP_Serv = data[Usuario][0]
+                        User_Pto_Serv = data[Usuario][1]
+                        print(User_IP_Serv)
+                        print(User_Pto_Serv)
+                        
+                        #Mando al uaserver el BYE
+                        print(client)
+                        print(cliente)
+                        my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                        my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                        my_socket.connect((User_IP_Serv, int(User_Pto_Serv)))
+                        my_socket.send(bytes(cliente, 'utf-8') + b'\r\n')
+                        print("Enviado BYE" + "\r\n")
                 
-            
+                        data = my_socket.recv(1024)
+                        reception = data.decode('utf-8')
+                        my_reception = reception.split("\r\n")
+                        print(my_reception)
+                        if my_reception[0] == "SIP/2.0 200 OK":
+                            print("Bien Recibido")
+                            self.wfile.write(bytes(reception, 'utf-8'))
             
             
             
