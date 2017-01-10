@@ -8,6 +8,7 @@ import sys
 import socket
 import socketserver
 import os
+import time
 
 
 #Defino la clase que tratara mi xml
@@ -50,9 +51,23 @@ class EchoHandler(socketserver.DatagramRequestHandler):
         client = self.rfile.read().decode('utf-8').split()
         print("CLIENTE ----->")
         print(client)
+                        
+        
+        #LOG############################
+        Log = diccionario['audio_path']
+        
+        fichero_log = Log
+        fichero = open(fichero_log, 'a')
+        hora = time.strftime('%Y%m%d%H%M%S', time.gmtime(time.time()))
+        
         
         if client[0] == "INVITE":
             print("INVITE RECIBIDO")
+            
+            #LOG
+            informacion = hora + " Recived from" + " " + client[6] + " " + "SIP/2.0 INVITE" + "\r\n"
+            fichero.write(informacion)
+            
             respuesta = "SIP/2.0 100 TRYING\r\n\r\n"
             respuesta += "SIP/2.0 180 RINGING\r\n\r\n"
             respuesta += "SIP/2.0 200 OK\r\n\r\n"
@@ -63,9 +78,19 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             paquete = respuesta + cabecera_sdp + sdp
             
             self.wfile.write(bytes(paquete, 'utf-8'))
+            
+            #LOG
+            informacion = hora + " Sent to " + " " + client[6] + " " + "SIP/2.0 INVITE" + "\r\n"
+            fichero.write(informacion)
         
         if client[0] == "ACK":
             print("ACK RECIBIDO")
+            
+            #LOG
+            informacion = hora + " Received from" + " " + str(Proxy_IP) + str(Puerto_RTP) + "SIP/2.0 ACK" + "\r\n"
+            fichero.write(informacion)
+            
+            
             aEjecutar= './mp32rtp -i ' + IP_Client + ' -p ' + str(Puerto_RTP) 
             aEjecutar+= ' < ' + audio_path
             print ("Vamos a ejecutar", aEjecutar)
@@ -75,7 +100,12 @@ class EchoHandler(socketserver.DatagramRequestHandler):
         if client[0] == "BYE":
             print("BYE RECIBIDO")
             respuesta = "SIP/2.0 200 OK\r\n\r\n"
-            self.wfile.write(bytes(respuesta, 'utf-8'))            
+            self.wfile.write(bytes(respuesta, 'utf-8'))   
+            
+            #LOG
+            informacion = hora + " Received " + "BYE" + " " + respuesta
+            fichero.write(informacion)     
+                
         
 
 
