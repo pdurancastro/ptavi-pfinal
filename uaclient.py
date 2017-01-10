@@ -103,19 +103,27 @@ if __name__ == "__main__":
         puerto_rtp=diccionario['rtp_puerto']
         Peticion = Metodo + " " + 'sip:' + Opcion + ' SIP/2.0\r\n'
         Cabecera = 'Content-Type: application/sdp\r\n\r\n'
-        Paq_sdp = 'v=0 ' + 'o=' + username + ' ' + ip_servidor + '\r\n' + 's=misesion\r\n' + 't=0' + '\r\n' + 'm = audio ' + str(puerto_rtp) + ' RTP'
+        Paq_sdp = 'v=0 ' + 'o=' + username + ' ' + ip_servidor + '\r\n' + 's=misesion\r\n' + 't=0' + '\r\n' + 'm=audio ' + str(puerto_rtp) + ' RTP' +'\r\n'
         MENSAJE = Peticion + Cabecera + Paq_sdp
-        print("Enviando----->")
+        print("Enviando INVITE----->")
         print(MENSAJE)
         my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
         data = my_socket.recv(1024)
-        print(data.decode('utf-8'))
+        recepcion = data.decode('utf-8')
+        print(recepcion)
+        my_reception = recepcion.split("\r\n")
+        print(my_reception)
+        
+        if my_reception[0] == "SIP/2.0 100 TRYING" and my_reception[2] == "SIP/2.0 180 RINGING" and my_reception[4] == "SIP/2.0 200 OK":
+            respuesta = 'ACK sip:' + Opcion + ' SIP/2.0'
+            print("Enviando ACK----->")
+            my_socket.send(bytes(respuesta, 'utf-8'))
          
     
     elif Metodo == 'BYE':
         Peticion = Metodo + " " + 'sip:' + Opcion + ' SIP/2.0\r\n'
         MENSAJE = Peticion
-        print("Enviando----->")
+        print("Enviando BYE----->")
         print(MENSAJE)
         my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
         data = my_socket.recv(1024)
