@@ -245,10 +245,17 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     print("Este es mi envio al servidor "+ "\r\n" + cliente)
                     my_socket.send(bytes(cliente, 'utf-8'))
                     
-
+                    print("Recepción de la conexion establecida")
+                    data = my_socket.recv(1024)
+                    reception = data.decode('utf-8')
+                    print(reception)
                     
-                    
+                    my_reception = reception.split("\r\n")
+                    print(my_reception)
                 
+                    if my_reception[0] == "SIP/2.0 100 TRYING" and my_reception[2] == "SIP/2.0 180 RINGING" and my_reception[4] == "SIP/2.0 200 OK" :
+                        print("Llegan los 3 mensajes de recepcion por lo tanto reenvio")   
+                        self.wfile.write(bytes(reception, 'utf-8'))
                 else:
                     print("El Usuario al que quiero invitar no Esta")
                     request = b'SIP/2.0 404 User Not Found\r\n'
@@ -258,7 +265,34 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 
                         
             
-        
+        if client[0] == "ACK":
+            print("SOY UN ACK!!!")
+            peticion = client[1]
+            usr_cliente = peticion.split(":")
+            usr_cliente = usr_cliente[1]
+            print(usr_cliente)
+            
+            with open('usuarios.json') as file:
+                data = json.load(file)
+                for Usuario in data:
+                    if Usuario == usr_cliente:
+                        print("Coincide")
+                        print(client)
+                        User_IP = data[Usuario][0]
+                        User_Pto = data[Usuario][1]
+                        
+                        
+                        my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                        my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                        my_socket.connect((User_IP, int(User_Pto)))
+                        my_socket.send(bytes(cliente, 'utf-8') + b'\r\n')
+                    
+                    
+                        #data = my_socket.recv(1024)
+                        #print(data.decode('utf-8'))
+            
+            
+            
         if client[0] == "BYE":
             print(client[0])
             
