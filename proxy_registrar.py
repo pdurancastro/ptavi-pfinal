@@ -325,7 +325,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             print(usr_cliente)
             
             #LOG
-            informacion = hora + "Received from" + " " + User1 + "SIP/2.0 ACK" + "\r\n"
+            informacion = hora + " Received from" + " " + User1 + "SIP/2.0 ACK" + "\r\n"
             fichero.write(informacion)  
             
             
@@ -351,7 +351,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                         print(data.decode('utf-8'))
                         
                         #LOG
-                        informacion = hora + "Received from" + " " + str(User_IP) + ":" + str(User_Pto) + " " + "SIP/2.0 RTP" + "\r\n"
+                        informacion = hora + " Received from" + " " + str(User_IP) + ":" + str(User_Pto) + " " + "SIP/2.0 RTP" + "\r\n"
                         fichero.write(informacion)
             
             
@@ -396,7 +396,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                             print("Bien Recibido")
                             self.wfile.write(bytes(reception, 'utf-8'))
                             #LOG
-                            informacion = hora + "Received SIP/2.0 200 OK"
+                            informacion = hora + " Received SIP/2.0 200 OK"
                             fichero.write(informacion)
             
             
