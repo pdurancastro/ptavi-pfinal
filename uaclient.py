@@ -11,6 +11,8 @@ import uaserver
 import socket
 import time
 import hashlib
+import os
+
 
 if __name__ == "__main__":
 
@@ -47,6 +49,7 @@ if __name__ == "__main__":
     Proxy_IP = diccionario['regproxy_ip']
     Proxy_Puerto = int(diccionario['regproxy_puerto'])
     Log = diccionario['log_path']
+    audio_path = diccionario['audio_path']
 
 
     #print(Proxy_IP)
@@ -55,9 +58,20 @@ if __name__ == "__main__":
     my_socket.connect((Proxy_IP, Proxy_Puerto))   
     ##################################################################################
     
+    #LOG############################
+    fichero_log = Log
+    fichero = open(fichero_log, 'a')
+    hora = time.strftime('%Y%m%d%H%M%S', time.gmtime(time.time()))
+    
+    
+    
     #########MANDAR_PETICION####################################################
     username = diccionario['username']
-    if Metodo == 'REGISTER':        
+    if Metodo == 'REGISTER':
+        #LOG
+        informacion = hora + " Starting... \r\n"
+        fichero.write(informacion)
+                
         puerto_server = diccionario['uaserver_puerto']            
         Peticion = Metodo + " " + 'sip:' + username + ":" + puerto_server +' SIP/2.0\r\n'
         Cabecera = "Expires: " + str(Opcion) + '\r\n\r\n'
@@ -69,6 +83,12 @@ if __name__ == "__main__":
         data_1 = data.decode('utf-8')
         print(data_1)
         data_1 = data_1.split(' ')
+        
+        #LOG
+        informacion = hora + " Sent to " + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + MENSAJE.replace("\r\n", " ") + "\r\n"
+        fichero.write(informacion)
+        
+        
         
         if data_1[1] == "401":
             print("Entra en el reenvio del register")
@@ -96,7 +116,24 @@ if __name__ == "__main__":
             print(MENSAJE)
             my_socket.send(bytes(MENSAJE, 'utf-8') + b'\r\n')
 
-        
+            #LOG
+            informacion = hora + " Received from " + str(Proxy_IP) + ":" + str(Proxy_Puerto)
+            fichero.write(informacion)
+            
+        if data_1[1] == "404":
+            print("SIP/2.0 404 User Not Found")
+            
+            #LOG
+            informacion = hora + " SIP/2.0 404 User Not Found"
+            fichero.write(informacion)
+            
+        if data_1[1] == "405":
+            print("SIP/2.0 405 Method Not Allowed")
+            
+            #LOG
+            informacion = hora + " SIP/2.0 405 Method Not Allowed"
+            fichero.write(informacion)    
+            
     
     elif Metodo == 'INVITE':
         ip_servidor = diccionario['uaserver_ip']
@@ -114,10 +151,25 @@ if __name__ == "__main__":
         my_reception = recepcion.split("\r\n")
         print(my_reception)
         
+        #LOG
+        informacion = hora + " Sent to" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + ": " + MENSAJE.replace("\r\n", " ") + "\r\n"
+        fichero.write(informacion)   
+        
         if my_reception[0] == "SIP/2.0 100 TRYING" and my_reception[2] == "SIP/2.0 180 RINGING" and my_reception[4] == "SIP/2.0 200 OK":
             respuesta = 'ACK sip:' + Opcion + ' SIP/2.0'
             print("Enviando ACK----->")
             my_socket.send(bytes(respuesta, 'utf-8'))
+            
+            aEjecutar= './mp32rtp -i  127.0.0.1 -p ' + str(puerto_rtp) 
+            aEjecutar+= ' < ' + audio_path
+            print ("Vamos a ejecutar", aEjecutar)
+            os.system(aEjecutar)
+            print("Ejecutado")
+            
+            
+            #LOG
+            informacion = hora + " " + "Sent to" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + respuesta.replace("\r\n", " ") + "\r\n"
+            fichero.write(informacion)
          
     
     elif Metodo == 'BYE':
@@ -131,10 +183,17 @@ if __name__ == "__main__":
         print(recepcion)
         my_reception = recepcion.split("\r\n")
         print(my_reception)
+        
+        #LOG
+        informacion = hora + " " + "Sent to" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + MENSAJE.replace("\r\n", " ") + "\r\n" 
+        fichero.write(informacion)
+        
         if my_reception[0] == "SIP/2.0 200 OK":
             print("Recibo el SIP/2.0 200 OK ")
-    
-    #else:
+            
+            #LOG
+            informacion = hora + "Received from" + str(Proxy_IP) + ":" + str(Proxy_Puerto) + " " + "Recibo el SIP/2.0 200 OK \r\n"
+
     
 
     
