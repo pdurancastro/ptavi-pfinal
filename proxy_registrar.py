@@ -133,33 +133,36 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                             Time = time.time()
                             Exp_Time = Time + int(client[4])
                             Tiempo_usuario = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(Exp_Time))
-                            
+
                             if client[4] != "0":
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
-                                print("Enviando 200 OK.....")                                
-                                self.dict[User_Name] = User_IP,User_Port,Expires,Tiempo_usuario                                                          
+                                print("Enviando 200 OK.....")
+                                self.dict[User_Name] = User_IP, User_Port, Expires, Tiempo_usuario
                                 self.register2json()
-                                
+
 #                               #LOG
-                                informacion = hora + " Sent to" + " " + str(User_IP) + ":" + str(User_Port) + " " + "SIP/2.0 200 OK" + "\r\n"
+                                informacion = hora + " Sent to" + " " \
+                                    + str(User_IP) + ":" + str(User_Port) \
+                                    + " " + "SIP/2.0 200 OK" + "\r\n"
                                 fichero.write(informacion)
-                               
+
                             else:
-                                del self.dict[User_Name]            
-                                self.register2json() 
-                                
+                                del self.dict[User_Name]
+                                self.register2json()
+
 #                               #LOG
-                                informacion = hora + " Delete" + " " + User1 + " " + str(User_IP) + ":" + str(User_Port) + " " + "\r\n"
+                                informacion = hora + " Delete" + " " \
+                                    + User1 + " " + str(User_IP) + ":" \
+                                    + str(User_Port) + " " + "\r\n"
                                 fichero.write(informacion)
-                                
-                        
-#                       #Necesito comparar mi 2 cliente con la información que me llega
-                        
+
+#                   #Comparo cliente_2 con la información que me llega
+
                     cliente_2 = client[1].split(":")
                     cliente_2 = cliente_2[1]
                     print(cliente_2)
 #           ###################################################################
-                        
+
 #           #USUARIO_2 REGISTER################################################
                     if cliente_2 == User2:
                         print("ESTAMOS CON EL CLIENTE " + cliente_2)
@@ -170,51 +173,50 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                         response_2 = client[7].split("response=")
                         response_2 = response_2[1]
                         if response_2 == new_response:
-#                       #Si el tiempo de expiracion es distinto de 0                       
+#                       #Si el tiempo de expiracion es distinto de 0
                             Time = time.time()
                             Exp_Time = Time + int(client[4])
                             Tiempo_usuario = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(Exp_Time))
                             if client[4] != "0":
                                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                                 print("Enviando 200 OK.....")
-                                self.dict[User_Name] = User_IP, User_Port, Expires, Tiempo_usuario                           
+                                self.dict[User_Name] = User_IP, User_Port, Expires, Tiempo_usuario
                                 self.register2json()
-                                
+
 #                               #LOG
-                                informacion = hora + " Sent to" + " " + str(User_IP) + ":" + str(User_Port) + " " + "SIP/2.0 200 OK" + "\r\n"
+                                informacion = hora + " Sent to" + " " \
+                                    + str(User_IP) + ":" + str(User_Port) \
+                                    + " " + "SIP/2.0 200 OK" + "\r\n"
                                 fichero.write(informacion)
-                                
+
                             else:
-                                del self.dict[User_Name]            
+                                del self.dict[User_Name]
                                 self.register2json()
-                                
+
 #                               #LOG
                                 informacion = hora + " Delete" + " " + User2 + " " + str(User_IP) + ":" + str(User_Port) + " " + "\r\n"
                                 fichero.write(informacion)
-                                
-                    self.json2register()                 
-                            
-                            
-                            
-            elif len(client) != 8 and len(client) !=5:
-                print("SIP/2.0 400 Bad Request") 
-                
+
+                    self.json2register()
+
+            elif len(client) != 8 and len(client) != 5:
+                print("SIP/2.0 400 Bad Request")
+
 #               #LOG
                 informacion = hora + " Sent to" + " " + str(User_IP) + ":" + str(User_Port) + " " + "SIP/2.0 400 Bad Request" + "\r\n"
-                fichero.write(informacion)                   
-                            
+                fichero.write(informacion)
+
             else:
-                print("Usuario no Autorizado")               
+                print("Usuario no Autorizado")
                 self.wfile.write(b"SIP/2.0 401 Unauthorized\r\n" + b"WWW Authenticate: Digest nonce=" + noncebt + \
-                                 b"\r\n\r\n") 
-                
+                                 b"\r\n\r\n")
+
 #               #LOG
                 informacion = hora + " Sent to" + " " + str(User_IP) + ":" + str(User_Port) + " " + "SIP/2.0 401 Unauthorized" + "\r\n"
-                fichero.write(informacion)             
+                fichero.write(informacion)
 
-            
         if client[0] == "INVITE":
-            
+
 #           #Obtencion de direcciones SIP origen y destino
             User_Orign = client[6]
             User_Orign = User_Orign.split("=")
@@ -222,7 +224,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             User_Invit = client[1]
             User_Invit = User_Invit.split(":")
             User_Invit = User_Invit[1]
-                        
+
             print("Usuario al que quiero hacer INVITE " + User_Invit)
             with open('usuarios.json') as file:
                 data = json.load(file)
@@ -232,28 +234,26 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 for Usuario in data:
                     if Usuario == User_Invit:
                         Esta = True
-                if Esta == True:
+                if Esta is True:
                     print("El Usuario al que quiero invitar Esta")
-                    
-                    #Creo un socket para mandar la información al usuario del invite
+
+#                   #Creo un socket para mandar la información al usuario del invite
                     my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                     my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                    
+
                     Info_User_Invit = Informacion[User_Invit]
                     ip_user_inv = Info_User_Invit[0]
                     port_user_inv = Info_User_Invit[1]
                     print("Establezco conexion mediante los siguientes datos:")
-                    print("IP " + ip_user_inv + " " + "Puerto " + port_user_inv) 
+                    print("IP " + ip_user_inv + " " + "Puerto " + port_user_inv)
                     my_socket.connect((ip_user_inv, int(port_user_inv)))
-                    
-                    print("Este es mi envio al servidor "+ "\r\n" + cliente)
+
+                    print("Este es mi envio al servidor " + "\r\n" + cliente)
                     my_socket.send(bytes(cliente, 'utf-8'))
-                    
-                    
+
 #                   #LOG
                     informacion = hora + " Sent to" + " " + str(ip_user_inv) + ":" + str(port_user_inv) + " " + cliente + "\r\n"
-                    fichero.write(informacion) 
-
+                    fichero.write(informacion)
 
                     print("Recepción de la conexion establecida")
                     data = my_socket.recv(1024)
@@ -264,8 +264,11 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     print(my_reception)
 
 #                   #LOG
-                    informacion = hora + " Received from " + " " + str(ip_user_inv) + ":" + str(port_user_inv) + " " + "\r\n" + my_reception[0] \
-                                  + "\r\n" + my_reception[2] + "\r\n" + my_reception[4] + "\r\n"
+                    informacion = hora + " Received from " + " " \
+                        + str(ip_user_inv) + ":" + str(port_user_inv) \
+                        + " " + "\r\n" + my_reception[0] \
+                        + "\r\n" + my_reception[2] + "\r\n" \
+                        + my_reception[4] + "\r\n"
                     fichero.write(informacion)
 
                     if my_reception[0] == "SIP/2.0 100 TRYING" \
